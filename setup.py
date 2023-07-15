@@ -9,7 +9,7 @@ with open('README.md', 'r') as f:
     long_description = f.read()
 
 with io.open('autoskip/__version__.py', 'rt', encoding='utf8') as f:
-    version = re.search(r'__version__ = \'(.*?)\'', f.read()).group(1)
+    version = re.search(r'__version__ = \'(.*?)\'', f.read())[1]
 
 setup(
     name='autoskip',
