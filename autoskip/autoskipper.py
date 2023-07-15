@@ -75,12 +75,10 @@ class Config():
                     self.notifications = settings['sendNotifications']
                     break
             except json.decoder.JSONDecodeError as e:
-                # Last try:
                 if i == tries - 1:
                     raise json.decoder.JSONDecodeError("Unable to properly read config json data.", e.doc, e.pos)
-                else:
-                    time.sleep(1)
-                    continue
+                time.sleep(1)
+                continue
 
     def write(self):
         json_data = {
@@ -120,14 +118,11 @@ class SongConfig():
                     self.artists = json.load(f)
                     break
 
-            # Gets errors if it's read while it writes from another process.
             except json.decoder.JSONDecodeError as e:
-                # Last try:
                 if i == tries - 1:
                     raise json.decoder.JSONDecodeError("Unable to properly read artist json data.", e.doc, e.pos)
-                else:
-                    time.sleep(1)
-                    continue
+                time.sleep(1)
+                continue
 
     # Using lower level python magic this can probably be done better.
     def create(self, artist):
@@ -149,7 +144,7 @@ class Song():
             self.artist = artist
             self.score = score
         else:
-            if (isWindows):
+            if isWindows:
                 PROCESS_QUERY_INFORMATION = 0x0400
                 # Doesn't seem to work with strings?
                 spotifyName = []
@@ -169,14 +164,14 @@ class Song():
                             spotifyName.append(text)
 
                 # Waits til found
-                while(True):
+                while True:
                     spotifyName = []
                     try:
                         win32gui.EnumWindows(get_spotify, None)
                     except pywintypes.error:
                         pass
 
-                    if (len(spotifyName) > 0):
+                    if spotifyName:
                         song_info = spotifyName[0]
                         if "Spotify" in song_info: # When no song is played, wait.
                             time.sleep(1)
@@ -210,7 +205,7 @@ def do_nothing(*args, **kwargs):
 
 
 def skip():
-    print(Fore.RED + 'Skipped!' + Style.RESET_ALL, end=' ')
+    print(f'{Fore.RED}Skipped!{Style.RESET_ALL}', end=' ')
     if (isWindows):
         win32api.keybd_event(0xB0, 0, 0, 0)
         time.sleep(.05)
@@ -271,11 +266,11 @@ def toggle():
     config = Config()
 
     if config.autoskip:
-        print(Fore.RED + 'Autoskip disabled' + Style.RESET_ALL, end=' ')
+        print(f'{Fore.RED}Autoskip disabled{Style.RESET_ALL}', end=' ')
         if config.notifications:
             notification('Autoskip disabled', title='Autoskipper')
     else:
-        print(Fore.GREEN + 'Autoskip enabled' + Style.RESET_ALL, end=' ')
+        print(f'{Fore.GREEN}Autoskip enabled{Style.RESET_ALL}', end=' ')
         if config.notifications:
             notification('Autoskip enabled', title='Autoskipper')
     config.autoskip = not config.autoskip
@@ -286,10 +281,10 @@ def notify():
     config = Config()
 
     if config.notifications:
-        print(Fore.RED + 'Notifications disabled' + Style.RESET_ALL, end=' ')
-        # notification('Notifications disabled', title='Autoskipper')
+        print(f'{Fore.RED}Notifications disabled{Style.RESET_ALL}', end=' ')
+            # notification('Notifications disabled', title='Autoskipper')
     else:
-        print(Fore.GREEN + 'Notifications enabled' + Style.RESET_ALL, end=' ')
+        print(f'{Fore.GREEN}Notifications enabled{Style.RESET_ALL}', end=' ')
         notification('Notifications enabled', title='Autoskipper')
     config.notifications = not config.notifications
     config.write()
@@ -425,7 +420,7 @@ def command_handler(command):
 
 
 class InputThread(threading.Thread):
-    def signal_handler(sig, frame):
+    def signal_handler(self, frame):
         # print('\nExiting')
         os._exit(1)
 
@@ -444,9 +439,9 @@ async def main(loop):
     config = Config()
 
     if config.autoskip:
-        print(Fore.GREEN + 'Autoskip enabled ' + Style.RESET_ALL, end=' ')
+        print(f'{Fore.GREEN}Autoskip enabled {Style.RESET_ALL}', end=' ')
     else:
-        print(Fore.RED + 'Autoskip disabled ' + Style.RESET_ALL, end=' ')
+        print(f'{Fore.RED}Autoskip disabled {Style.RESET_ALL}', end=' ')
 
     past_song = Song()
     if (past_song.title, past_song.artist, past_song.score) != ("", "", 0):
